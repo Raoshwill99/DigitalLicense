@@ -1,91 +1,59 @@
 # Blockchain-Based Digital Content Licensing Platform
 
-## Overview
+## Project Overview
 
-This project implements a decentralized platform for digital content licensing using blockchain technology. It allows creators to license their digital content (such as music, images, and videos) directly to users, leveraging the power of smart contracts for secure and transparent transactions.
+This project implements a decentralized platform for digital content licensing using blockchain technology. It allows creators to license their digital content (such as music, images, and videos) directly to users, leveraging the power of blockchain for secure transactions, automated royalty distributions, and transparent usage analytics.
 
 ### Key Features
 
-- Content registration and management
-- License purchasing and validation
-- Automated royalty distributions (planned)
-- Transparent usage analytics for creators (planned)
-- Integration with Bitcoin for microtransactions (planned)
+- Direct licensing of digital content from creators to users
+- Secure microtransactions using Bitcoin
+- Complex licensing terms and usage tracking managed on Stacks blockchain
+- Automated royalty distributions
+- Transparent usage analytics for creators
 
 ## Technology Stack
 
-- Blockchain: Stacks
-- Smart Contract Language: Clarity
-- Cryptocurrency: STX (Stacks Token), with plans to integrate Bitcoin
+- Stacks blockchain for smart contracts (using Clarity language)
+- Bitcoin blockchain for microtransactions
+- [Future implementation: Front-end framework (e.g., React, Vue.js)]
 
-## Current State
+## Smart Contract Structure
 
-The project is in its initial development phase. The current implementation includes:
+The core functionality is implemented in Clarity smart contracts:
 
-1. Basic content registration system
-2. Simple licensing mechanism
-3. License validity checking
+1. **Content Management**: Allows creators to add and manage their digital content.
+2. **Licensing System**: Enables users to purchase licenses for content.
+3. **License Validation**: Provides a mechanism to check the validity of licenses.
 
-## Setup
+## Getting Started
 
-To set up and interact with this project, you'll need:
+[Instructions for setting up the development environment, deploying contracts, etc. will be added as the project progresses]
 
-1. A Stacks wallet (e.g., Hiro Wallet)
-2. Clarinet for local development and testing
+## Current Status
 
-### Installation
+The project is in its initial development phase. The basic structure for content management and licensing has been implemented.
 
-1. Install Clarinet by following the instructions at [Clarinet Documentation](https://docs.hiro.so/smart-contracts/clarinet)
-2. Clone this repository:
-   ```
-   git clone [repository-url]
-   cd digital-content-licensing-platform
-   ```
-3. Initialize the Clarinet project:
-   ```
-   clarinet init
-   ```
+### Implemented Features
 
-## Usage
+- Content structure and storage
+- License structure and storage
+- Function to add new content
+- Function to purchase a license
+- Function to check license validity
 
-### For Content Creators
+### Upcoming Features
 
-To add new content:
-
-```clarity
-(contract-call? .digital-content-licensing-platform add-content "My Content Title" "image" u100 "Standard license terms")
-```
-
-### For Users
-
-To purchase a license:
-
-```clarity
-(contract-call? .digital-content-licensing-platform purchase-license u1)
-```
-
-To check if a license is valid:
-
-```clarity
-(contract-call? .digital-content-licensing-platform is-license-valid u1)
-```
-
-## Roadmap
-
-1. Implement royalty distribution system
-2. Add usage tracking and analytics
-3. Integrate Bitcoin for microtransactions
-4. Develop more complex licensing terms and conditions
-5. Implement content metadata and search functionality
+- Royalty distribution system
+- Usage tracking and analytics
+- Integration with Bitcoin for microtransactions
+- More complex licensing terms and conditions
+- Content metadata and search functionality
 
 ## Contributing
 
-We welcome contributions to this project. Please fork the repository and submit a pull request with your proposed changes.
+[Guidelines for contributing to the project will be added as it evolves]
 
 ## License
 
-[Specify the license under which this project is released]
-
-## Contact
-
-[Provide contact information or links for further inquiries]
+[License information will be added]
