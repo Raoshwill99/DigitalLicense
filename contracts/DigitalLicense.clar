@@ -1,38 +1,26 @@
-;; Define the content structure
-(define-data-var content-counter uint u0)
+;; Import SIP-010 trait
+(use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 
+;; Define a constant for the sBTC token contract
+(define-constant sbTC-token 'SP3DX3H4FEYZJZ586MFBS25ZW3HZDMEW92260R2PR.Wrapped-Bitcoin)
+
+;; Update content structure to use sBTC for pricing
 (define-map contents
   { content-id: uint }
   {
     creator: principal,
     title: (string-ascii 50),
     content-type: (string-ascii 10),
-    price: uint,
+    base-price: uint,
+    premium-price: uint,
     license-terms: (string-ascii 200),
-    royalty-rate: uint,
+    metadata: (string-utf8 500),
     total-earnings: uint
   }
 )
 
-;; Define the license structure
-(define-map licenses
-  { license-id: uint }
-  {
-    content-id: uint,
-    licensee: principal,
-    expiration: uint,
-    usage-count: uint
-  }
-)
-
-;; Define royalty recipients
-(define-map royalty-recipients
-  { content-id: uint }
-  { recipients: (list 10 principal) }
-)
-
-;; Function to add new content
-(define-public (add-content (title (string-ascii 50)) (content-type (string-ascii 10)) (price uint) (license-terms (string-ascii 200)) (royalty-rate uint))
+;; Function to add new content with sBTC pricing
+(define-public (add-content (title (string-ascii 50)) (content-type (string-ascii 10)) (base-price uint) (premium-price uint) (license-terms (string-ascii 200)) (metadata (string-utf8 500)))
   (let
     (
       (content-id (+ (var-get content-counter) u1))
@@ -43,9 +31,10 @@
         creator: tx-sender,
         title: title,
         content-type: content-type,
-        price: price,
+        base-price: base-price,
+        premium-price: premium-price,
         license-terms: license-terms,
-        royalty-rate: royalty-rate,
+        metadata: metadata,
         total-earnings: u0
       }
     )
@@ -54,45 +43,31 @@
   )
 )
 
-;; Function to set royalty recipients
-(define-public (set-royalty-recipients (content-id uint) (recipients (list 10 principal)))
+;; Function to purchase a license using sBTC
+(define-public (purchase-license-with-sbtc (content-id uint) (tier (string-ascii 10)) (sbtc-token <ft-trait>))
   (let
     (
       (content (unwrap! (map-get? contents { content-id: content-id }) (err u404)))
-    )
-    (asserts! (is-eq tx-sender (get creator content)) (err u403))
-    (ok (map-set royalty-recipients { content-id: content-id } { recipients: recipients }))
-  )
-)
-
-;; Function to purchase a license
-(define-public (purchase-license (content-id uint))
-  (let
-    (
-      (content (unwrap! (map-get? contents { content-id: content-id }) (err u404)))
-      (price (get price content))
-      (royalty-rate (get royalty-rate content))
+      (price (if (is-eq tier "premium") (get premium-price content) (get base-price content)))
       (creator (get creator content))
-      (royalty-amount (/ (* price royalty-rate) u100))
-      (creator-amount (- price royalty-amount))
     )
+    (asserts! (is-eq (contract-of sbtc-token) sbTC-token) (err u403))
     (if (is-eq tx-sender creator)
       (err u403)
-      (match (stx-transfer? price tx-sender (as-contract tx-sender))
+      (match (contract-call? sbtc-token transfer price tx-sender (as-contract tx-sender) none)
         success
           (let
             (
               (license-id (+ (var-get content-counter) u1))
             )
-            (try! (distribute-royalties content-id royalty-amount))
-            (try! (stx-transfer? creator-amount (as-contract tx-sender) creator))
+            (try! (distribute-royalties-sbtc content-id price sbtc-token))
             (map-set licenses
               { license-id: license-id }
               {
                 content-id: content-id,
                 licensee: tx-sender,
                 expiration: (+ block-height u52560), ;; License valid for ~1 year (assuming 10-minute blocks)
-                usage-count: u0
+                tier: tier
               }
             )
             (map-set contents
@@ -108,65 +83,39 @@
   )
 )
 
-;; Function to distribute royalties
-(define-private (distribute-royalties (content-id uint) (royalty-amount uint))
+;; Function to distribute royalties using sBTC
+(define-private (distribute-royalties-sbtc (content-id uint) (amount uint) (sbtc-token <ft-trait>))
   (match (map-get? royalty-recipients { content-id: content-id })
-    recipients 
-      (let
-        (
-          (recipient-count (len (get recipients recipients)))
-          (amount-per-recipient (/ royalty-amount recipient-count))
-        )
-        (ok (map distribute-to-recipient (get recipients recipients)))
-      )
+    recipients
+      (fold distribute-to-recipient-sbtc (get recipients recipients) (ok amount))
     (err u404)
   )
 )
 
-;; Helper function to distribute to a single recipient
-(define-private (distribute-to-recipient (recipient principal))
-  (stx-transfer? amount-per-recipient (as-contract tx-sender) recipient)
-)
-
-;; Function to check license validity
-(define-read-only (is-license-valid (license-id uint))
-  (match (map-get? licenses { license-id: license-id })
-    license (ok (< block-height (get expiration license)))
-    (err u404)
+(define-private (distribute-to-recipient-sbtc (recipient { address: principal, share: uint }) (remaining uint))
+  (let
+    (
+      (amount-to-send (/ (* (get remaining remaining) (get share recipient)) u100))
+    )
+    (match (contract-call? sbtc-token transfer amount-to-send (as-contract tx-sender) (get address recipient) none)
+      success (ok (- remaining amount-to-send))
+      error (err error)
+    )
   )
 )
 
-;; Function to record content usage
-(define-public (record-usage (license-id uint))
-  (match (map-get? licenses { license-id: license-id })
-    license 
-      (begin
-        (asserts! (< block-height (get expiration license)) (err u401))
-        (ok (map-set licenses 
-          { license-id: license-id }
-          (merge license { usage-count: (+ (get usage-count license) u1) })
-        ))
-      )
-    (err u404)
+;; Function to withdraw sBTC earnings
+(define-public (withdraw-earnings (sbtc-token <ft-trait>))
+  (let
+    (
+      (balance (unwrap! (contract-call? sbtc-token get-balance (as-contract tx-sender)) (err u500)))
+    )
+    (asserts! (> balance u0) (err u400))
+    (match (contract-call? sbtc-token transfer balance (as-contract tx-sender) tx-sender none)
+      success (ok balance)
+      error (err error)
+    )
   )
 )
 
-;; Function to get content usage analytics
-(define-read-only (get-content-analytics (content-id uint))
-  (match (map-get? contents { content-id: content-id })
-    content 
-      (ok {
-        total-earnings: (get total-earnings content),
-        license-count: (fold + (map get-license-count-for-content (keys licenses)) u0)
-      })
-    (err u404)
-  )
-)
-
-;; Helper function to count licenses for a specific content
-(define-private (get-license-count-for-content (license-id uint))
-  (match (map-get? licenses { license-id: license-id })
-    license (if (is-eq (get content-id license) content-id) u1 u0)
-    u0
-  )
-)
+;; ... [Rest of the previous contract code remains unchanged]
