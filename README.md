@@ -1,45 +1,82 @@
 # Blockchain-Based Digital Content Licensing Platform
 
-## Project Overview
+## Overview
 
-This project implements a decentralized platform for digital content licensing using blockchain technology. It allows creators to license their digital content (such as music, images, and videos) directly to users, leveraging the power of blockchain for secure transactions, automated royalty distributions, and transparent usage analytics.
+This project implements a decentralized platform for digital content licensing using blockchain technology. It allows creators to license their digital content (such as music, images, and videos) directly to users, leveraging the power of smart contracts for secure and transparent transactions.
 
-## Features
-- Content registration
-- License purchasing
-- License validity checking
+### Key Features
 
-## Tech Stack
+- Content registration and management
+- License purchasing and validation
+- Automated royalty distributions (planned)
+- Transparent usage analytics for creators (planned)
+- Integration with Bitcoin for microtransactions (planned)
+
+## Technology Stack
+
 - Blockchain: Stacks
 - Smart Contract Language: Clarity
-- Token: STX (Stacks Token)
+- Cryptocurrency: STX (Stacks Token), with plans to integrate Bitcoin
 
-## Smart Contract Functions
-1. `add-content`: Register new content
-2. `purchase-license`: Buy a license for content
-3. `is-license-valid`: Check if a license is still valid
+## Current State
+
+The project is in its initial development phase. The current implementation includes:
+
+1. Basic content registration system
+2. Simple licensing mechanism
+3. License validity checking
 
 ## Setup
-1. Install [Clarinet](https://docs.hiro.so/smart-contracts/clarinet)
-2. Clone the repository
-3. Run `clarinet init` in the project directory
 
-## Usage Example
+To set up and interact with this project, you'll need:
+
+1. A Stacks wallet (e.g., Hiro Wallet)
+2. Clarinet for local development and testing
+
+### Installation
+
+1. Install Clarinet by following the instructions at [Clarinet Documentation](https://docs.hiro.so/smart-contracts/clarinet)
+2. Clone this repository:
+   ```
+   git clone [repository-url]
+   cd digital-content-licensing-platform
+   ```
+3. Initialize the Clarinet project:
+   ```
+   clarinet init
+   ```
+
+## Usage
+
+### For Content Creators
+
+To add new content:
+
 ```clarity
-;; Add content
-(contract-call? .digital-content-licensing-platform add-content "My Song" "audio" u100 "Standard license")
+(contract-call? .digital-content-licensing-platform add-content "My Content Title" "image" u100 "Standard license terms")
+```
 
-;; Purchase license
+### For Users
+
+To purchase a license:
+
+```clarity
 (contract-call? .digital-content-licensing-platform purchase-license u1)
+```
 
-;; Check license validity
+To check if a license is valid:
+
+```clarity
 (contract-call? .digital-content-licensing-platform is-license-valid u1)
 ```
 
-## Future Plans
-- Royalty distribution
-- Usage analytics
-- Bitcoin integration for microtransactions
+## Roadmap
+
+1. Implement royalty distribution system
+2. Add usage tracking and analytics
+3. Integrate Bitcoin for microtransactions
+4. Develop more complex licensing terms and conditions
+5. Implement content metadata and search functionality
 
 ## Contributing
 
