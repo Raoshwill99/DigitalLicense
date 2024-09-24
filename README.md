@@ -4,56 +4,51 @@
 
 This project implements a decentralized platform for digital content licensing using blockchain technology. It allows creators to license their digital content (such as music, images, and videos) directly to users, leveraging the power of blockchain for secure transactions, automated royalty distributions, and transparent usage analytics.
 
-### Key Features
+## Features
+- Content registration
+- License purchasing
+- License validity checking
 
-- Direct licensing of digital content from creators to users
-- Secure microtransactions using Bitcoin
-- Complex licensing terms and usage tracking managed on Stacks blockchain
-- Automated royalty distributions
-- Transparent usage analytics for creators
+## Tech Stack
+- Blockchain: Stacks
+- Smart Contract Language: Clarity
+- Token: STX (Stacks Token)
 
-## Technology Stack
+## Smart Contract Functions
+1. `add-content`: Register new content
+2. `purchase-license`: Buy a license for content
+3. `is-license-valid`: Check if a license is still valid
 
-- Stacks blockchain for smart contracts (using Clarity language)
-- Bitcoin blockchain for microtransactions
-- [Future implementation: Front-end framework (e.g., React, Vue.js)]
+## Setup
+1. Install [Clarinet](https://docs.hiro.so/smart-contracts/clarinet)
+2. Clone the repository
+3. Run `clarinet init` in the project directory
 
-## Smart Contract Structure
+## Usage Example
+```clarity
+;; Add content
+(contract-call? .digital-content-licensing-platform add-content "My Song" "audio" u100 "Standard license")
 
-The core functionality is implemented in Clarity smart contracts:
+;; Purchase license
+(contract-call? .digital-content-licensing-platform purchase-license u1)
 
-1. **Content Management**: Allows creators to add and manage their digital content.
-2. **Licensing System**: Enables users to purchase licenses for content.
-3. **License Validation**: Provides a mechanism to check the validity of licenses.
+;; Check license validity
+(contract-call? .digital-content-licensing-platform is-license-valid u1)
+```
 
-## Getting Started
-
-[Instructions for setting up the development environment, deploying contracts, etc. will be added as the project progresses]
-
-## Current Status
-
-The project is in its initial development phase. The basic structure for content management and licensing has been implemented.
-
-### Implemented Features
-
-- Content structure and storage
-- License structure and storage
-- Function to add new content
-- Function to purchase a license
-- Function to check license validity
-
-### Upcoming Features
-
-- Royalty distribution system
-- Usage tracking and analytics
-- Integration with Bitcoin for microtransactions
-- More complex licensing terms and conditions
-- Content metadata and search functionality
+## Future Plans
+- Royalty distribution
+- Usage analytics
+- Bitcoin integration for microtransactions
 
 ## Contributing
 
-[Guidelines for contributing to the project will be added as it evolves]
+Contributions to this project are welcome. Please ensure you follow the coding standards and submit pull requests for any new features or bug fixes.
 
 ## License
 
-[License information will be added]
+[MIT License](LICENSE)
+
+## Contact
+
+For any queries regarding this project, please open an issue in the GitHub repository.
