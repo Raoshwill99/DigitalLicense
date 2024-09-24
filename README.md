@@ -8,9 +8,9 @@ This project implements a decentralized platform for digital content licensing u
 
 - Content registration and management
 - License purchasing and validation
-- Automated royalty distributions (planned)
-- Transparent usage analytics for creators (planned)
-- Integration with Bitcoin for microtransactions (planned)
+- Automated royalty distributions 
+- Transparent usage analytics for creators 
+- Integration with Bitcoin for microtransactions
 
 ## Technology Stack
 
